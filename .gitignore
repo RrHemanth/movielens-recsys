@@ -5,8 +5,8 @@ __pycache__/
 .ruff_cache/
 
 # Data and generated outputs (rebuilt by the pipeline, never committed)
-data/
-mlruns/
+/data/
+/mlruns/
 *.duckdb
 
 # macOS
