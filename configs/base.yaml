@@ -1,0 +1,8 @@
+seed: 42
+paths:
+  raw: data/raw
+  interim: data/interim
+  processed: data/processed
+  duckdb: data/recsys.duckdb
+data:
+  dataset: ml-25m
