@@ -6,3 +6,8 @@ paths:
   duckdb: data/recsys.duckdb
 data:
   dataset: ml-25m
+
+split:
+  val_start: "2018-01-01"   # validation = all of 2018 (UTC)
+  test_start: "2019-01-01"  # test = 2019 onward (UTC)
+  relevant_threshold: 4.0   # a held-out rating counts as a "hit" if >= this
