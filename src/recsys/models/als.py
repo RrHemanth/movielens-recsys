@@ -74,3 +74,16 @@ class ALSRecommender:
             return {}
         history = self.train_pairs.filter(F.col("user_id").isin(user_ids)).toPandas()
         return history.groupby("user_id")["movie_id"].apply(set).to_dict()
+
+    def save_vectors(self, out_dir) -> None:
+        """Save learned movie and user vectors as parquet files."""
+        out_dir.mkdir(parents=True, exist_ok=True)
+        pd.DataFrame({
+            "movie_id": self.movie_ids,
+            "vector": [v.tolist() for v in self.movie_vectors],
+        }).to_parquet(out_dir / "movie_vectors.parquet")
+        users = sorted(self.user_index, key=self.user_index.get)   # in row order
+        pd.DataFrame({
+            "user_id": users,
+            "vector": [v.tolist() for v in self.user_vectors],
+        }).to_parquet(out_dir / "user_vectors.parquet")
