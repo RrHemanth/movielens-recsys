@@ -3,11 +3,12 @@ name = "recsys"
 version = "0.1.0"
 requires-python = ">=3.11,<3.12"
 dependencies = [
-    "pandas>=2.2",
+    "pandas>=2.2,<3",
     "pyarrow>=16",
     "duckdb>=1.1",
     "pyyaml>=6",
     "mlflow>=3.18.0",
+    "pyspark>=4.3.0",
 ]
 
 [dependency-groups]
