@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from pyspark.ml.recommendation import ALS
 from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
