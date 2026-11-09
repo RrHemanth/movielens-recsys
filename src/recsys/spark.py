@@ -1,4 +1,7 @@
 from pyspark.sql import SparkSession
+import os
+
+os.environ.setdefault("SPARK_LOCAL_IP", "127.0.0.1")
 
 
 def get_spark(app_name: str, driver_memory: str = "8g") -> SparkSession:
