@@ -1,6 +1,7 @@
 import tempfile
 import time
 from pathlib import Path
+from recsys.data.movies import load_genres
 
 import mlflow
 import pandas as pd
