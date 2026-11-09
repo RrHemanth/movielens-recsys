@@ -7,18 +7,23 @@ from pyspark.sql import functions as F
 class ALSRecommender:
     """Implicit-feedback ALS: learns taste vectors from 'liked' ratings (rating >= threshold)."""
 
-    def __init__(self, rank=64, reg_param=0.1, alpha=10.0, max_iter=10, threshold=4.0, seed=42):
+    def __init__(self, rank=64, reg_param=0.1, alpha=10.0, max_iter=10, threshold=4.0, seed=42, train_start_ts=None):
         self.rank = rank              # how many taste numbers per user/movie
         self.reg_param = reg_param    # how strongly to keep taste numbers small (regularization)
         self.alpha = alpha            # how much more a "liked" counts than an empty cell
         self.max_iter = max_iter      # rounds of back-and-forth (users, then movies)
         self.threshold = threshold    # rating >= this counts as "liked"
         self.seed = seed              # fixes randomness so reruns give the same result
+        self.train_start_ts = train_start_ts  # learn only from ratings at/after this time (None = all)
 
     def fit(self, train: DataFrame) -> "ALSRecommender":
         """Learn taste vectors from a Spark DataFrame with user_id, movie_id, rating."""
+                # Learn taste only from the chosen time window...
+        learn_from = train
+        if self.train_start_ts is not None:
+            learn_from = train.filter(F.col("ts") >= self.train_start_ts)
         liked = (
-            train.filter(F.col("rating") >= self.threshold)
+            learn_from.filter(F.col("rating") >= self.threshold)
             .select("user_id", "movie_id", F.lit(1.0).alias("liked"))
         )
         als = ALS(

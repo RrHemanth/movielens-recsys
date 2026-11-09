@@ -2,6 +2,7 @@ import argparse
 import tempfile
 import time
 from pathlib import Path
+from recsys.data.split import to_unix_seconds
 
 import mlflow
 import pandas as pd
@@ -21,6 +22,7 @@ def parse_args():
     parser.add_argument("--reg", type=float, default=0.1)
     parser.add_argument("--alpha", type=float, default=10.0)
     parser.add_argument("--iters", type=int, default=10)
+    parser.add_argument("--train-start-year", type=int, default=None, help="Learn only from ratings in this year or later (default: all history)")
     return parser.parse_args()
 
 
@@ -41,14 +43,17 @@ def main():
     n_catalog = train["movie_id"].nunique()
     val_users = val["user_id"].unique().tolist()
 
-    run_name = f"als rank={args.rank} reg={args.reg} alpha={args.alpha} iters={args.iters}"
+    start_year = args.train_start_year
+    train_start_ts = to_unix_seconds(f"{start_year}-01-01") if start_year else None
+    window = f"from {start_year}" if start_year else "all years"
+    run_name = f"als {window} rank={args.rank} reg={args.reg} alpha={args.alpha} iters={args.iters}"
     with mlflow.start_run(run_name=run_name):
         # 1. Train ALS with Spark
         spark = get_spark("als")
         start = time.time()
         als = ALSRecommender(
             rank=args.rank, reg_param=args.reg, alpha=args.alpha, max_iter=args.iters,
-            threshold=threshold, seed=cfg["seed"],
+            threshold=threshold, seed=cfg["seed"], train_start_ts=train_start_ts
         ).fit(spark.read.parquet(str(processed / "train.parquet")))
         fit_seconds = time.time() - start
 
@@ -74,6 +79,7 @@ def main():
             "fallback": "popularity_90d",
             "k": k, "relevant_threshold": threshold, "eval_set": "val",
             "val_start": cfg["split"]["val_start"], "test_start": cfg["split"]["test_start"],
+            "train_start_year": start_year if start_year else "all",
         })
         mlflow.set_tags(git_info())
         mlflow.log_metrics(summary_to_metrics(summary))
