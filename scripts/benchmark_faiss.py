@@ -26,8 +26,9 @@ def main():
     exact = drop_self(found, K)
 
     # Sanity check: FAISS exact search should agree with our NumPy version
-    agree = np.mean([set(most_similar(x, i, K)[0]) == set(exact[i]) for i in range(200)])
-    print(f"FAISS exact vs NumPy exact: same top-{K} for {agree:.0%} of 200 checked movies")
+    numpy_top = np.array([most_similar(x, i, K)[0] for i in range(200)])
+    overlap = neighbor_recall(exact[:200], numpy_top)
+    print(f"FAISS exact vs NumPy exact: average overlap of top-{K} lists = {overlap:.3f}")
 
     # 2. Approximate search: group movies into sections, search only the closest few
     quantizer = faiss.IndexFlatIP(dim)
