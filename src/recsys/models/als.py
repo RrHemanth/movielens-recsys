@@ -88,3 +88,13 @@ class ALSRecommender:
             "user_id": users,
             "vector": [v.tolist() for v in self.user_vectors],
         }).to_parquet(out_dir / "user_vectors.parquet")
+
+    def score_pairs(self, user_ids, movie_ids) -> np.ndarray:
+    """Taste match (dot product) for each (user, movie) pair; NaN if either has no vector."""
+    scores = np.full(len(user_ids), np.nan, dtype=np.float32)
+    u_pos = np.array([self.user_index.get(int(u), -1) for u in user_ids])
+    m_pos = np.array([self.movie_index.get(int(m), -1) for m in movie_ids])
+    ok = (u_pos >= 0) & (m_pos >= 0)
+    # Row-by-row dot product: user vector i . movie vector i, for every pair at once.
+    scores[ok] = np.einsum("ij,ij->i", self.user_vectors[u_pos[ok]], self.movie_vectors[m_pos[ok]])
+    return scores

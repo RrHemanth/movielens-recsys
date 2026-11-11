@@ -35,7 +35,9 @@ def build_candidates(spark, ratings_paths: list, as_of: str, users: list, als_pa
     popularity = PopularityRecommender(threshold=threshold, recent_days=90).fit(history_pd)
     pop_lists = popularity.recommend(users, k=n_pop)
 
-    return merge_candidate_lists(als_lists, pop_lists)
+    cands = merge_candidate_lists(als_lists, pop_lists)
+    cands["als_score"] = als.score_pairs(cands["user_id"].to_numpy(), cands["movie_id"].to_numpy())
+    return cands
 
 
 def candidate_recall(cands: pd.DataFrame, label_ratings: pd.DataFrame, threshold: float, users: list) -> pd.DataFrame:
@@ -44,7 +46,7 @@ def candidate_recall(cands: pd.DataFrame, label_ratings: pd.DataFrame, threshold
     liked = liked[liked["user_id"].isin(set(users))]
     shortlist = cands[["user_id", "movie_id"]].assign(on_shortlist=True)
     found = liked.merge(shortlist, on=["user_id", "movie_id"], how="left")
-    found["on_shortlist"] = found["on_shortlist"].fillna(False).astype(bool)
+    found["on_shortlist"] = found["on_shortlist"].notna()   # True if the merge found it, else missing -> False
     per_user = found.groupby("user_id")["on_shortlist"].agg(n_liked="size", n_found="sum")
     per_user["recall"] = per_user["n_found"] / per_user["n_liked"]
     return per_user.reset_index()
