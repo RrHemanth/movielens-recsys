@@ -5,7 +5,7 @@ import pandas as pd
 from recsys.config import load_config
 from recsys.data.movies import load_genres
 from recsys.data.split import to_unix_seconds
-from recsys.features import FEATURES, add_features, add_labels
+from recsys.features.reranker import FEATURES, add_features, add_labels
 
 
 def main():

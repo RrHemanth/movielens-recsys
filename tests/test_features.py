@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from recsys.features import add_features, add_labels, genre_match, movie_year
+from recsys.features.reranker import add_features, add_labels, genre_match, movie_year
 
 GENRES = {1: {"Sci-Fi"}, 2: {"Sci-Fi", "Action"}, 3: {"Comedy"},
           4: {"Sci-Fi", "Action"}, 5: {"Drama"}}
