@@ -4,7 +4,13 @@ import faiss
 import numpy as np
 
 from recsys.config import load_config
-from recsys.models.similarity import drop_self, load_vectors, most_similar, neighbor_recall, normalize
+from recsys.models.similarity import (
+    drop_self,
+    load_vectors,
+    most_similar,
+    neighbor_recall,
+    normalize,
+)
 
 K = 10
 N_SECTIONS = 128   # nlist: how many "sections" the approximate index groups movies into
@@ -12,7 +18,7 @@ N_SECTIONS = 128   # nlist: how many "sections" the approximate index groups mov
 
 def main():
     cfg = load_config()
-    movie_ids, vectors = load_vectors(cfg["paths"]["processed"] / "als" / "movie_vectors.parquet")
+    _, vectors = load_vectors(cfg["paths"]["processed"] / "als" / "movie_vectors.parquet")
     x = np.ascontiguousarray(normalize(vectors))   # length-1 vectors: inner product = cosine
     n, dim = x.shape
     print(f"{n:,} movies, {dim} numbers each\n")

@@ -1,26 +1,15 @@
 import tempfile
 import time
 from pathlib import Path
-from recsys.data.movies import load_genres
 
 import mlflow
 import pandas as pd
 
 from recsys.config import load_config
+from recsys.data.movies import load_genres
 from recsys.evaluation.evaluate import evaluate
 from recsys.models.popularity import PopularityRecommender
 from recsys.tracking import git_info, setup_mlflow, summary_to_metrics
-
-
-def load_genres(movies: pd.DataFrame) -> dict:
-    """{movie_id: set of genres}. '(no genres listed)' becomes an empty set."""
-    genres = {}
-    for movie_id, genre_text in zip(movies["movie_id"], movies["genres"]):
-        if genre_text == "(no genres listed)":
-            genres[movie_id] = set()
-        else:
-            genres[movie_id] = set(genre_text.split("|"))
-    return genres
 
 
 def main():

@@ -11,8 +11,8 @@ class LightGBMReranker:
     def __init__(self, objective="lambdarank", n_estimators=300, learning_rate=0.05,
                  num_leaves=31, min_child_samples=20, seed=42):
         self.objective = objective
-        settings = dict(n_estimators=n_estimators, learning_rate=learning_rate, num_leaves=num_leaves,
-                        min_child_samples=min_child_samples, random_state=seed, verbose=-1)
+        settings = {"n_estimators": n_estimators, "learning_rate": learning_rate, "num_leaves": num_leaves,
+            "min_child_samples": min_child_samples, "random_state": seed, "verbose": -1}
         if objective == "lambdarank":
             self.model = lgb.LGBMRanker(objective="lambdarank", **settings)
         else:

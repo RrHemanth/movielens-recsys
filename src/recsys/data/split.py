@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import duckdb
@@ -6,7 +6,7 @@ import duckdb
 
 def to_unix_seconds(date_str: str) -> int:
     """Turn '2018-01-01' into seconds since 1970-01-01, using UTC."""
-    dt = datetime.strptime(date_str, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+    dt = datetime.strptime(date_str, "%Y-%m-%d").replace(tzinfo=UTC)
     return int(dt.timestamp())
 
 

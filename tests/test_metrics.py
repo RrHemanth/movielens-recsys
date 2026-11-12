@@ -1,7 +1,5 @@
 import pytest
 
-from recsys.evaluation.metrics import ndcg_at_k, recall_at_k
-
 from recsys.evaluation.metrics import (
     catalog_coverage,
     genre_difference,

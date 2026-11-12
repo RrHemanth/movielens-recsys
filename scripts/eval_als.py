@@ -2,13 +2,13 @@ import argparse
 import tempfile
 import time
 from pathlib import Path
-from recsys.data.split import to_unix_seconds
 
 import mlflow
 import pandas as pd
 
 from recsys.config import load_config
 from recsys.data.movies import load_genres
+from recsys.data.split import to_unix_seconds
 from recsys.evaluation.evaluate import evaluate
 from recsys.models.als import ALSRecommender
 from recsys.models.popularity import PopularityRecommender

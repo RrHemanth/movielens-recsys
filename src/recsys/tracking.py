@@ -24,7 +24,7 @@ def git_info() -> dict:
             ["git", "status", "--porcelain"], cwd=REPO_ROOT, text=True
         ).strip()
         return {"git_commit": commit, "git_uncommitted_changes": str(bool(changes))}
-    except Exception:
+    except (subprocess.CalledProcessError, OSError):
         return {"git_commit": "unknown", "git_uncommitted_changes": "unknown"}
 
 

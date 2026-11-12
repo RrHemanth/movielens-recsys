@@ -1,6 +1,6 @@
 import json
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pandas as pd
 
@@ -57,7 +57,7 @@ def main():
 
     manifest = {
         "as_of": AS_OF,
-        "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "created_at": datetime.now(UTC).isoformat(timespec="seconds"),
         "n_users_precomputed": len(recs),
         "k": K,
         "als_params": ALS_PARAMS,

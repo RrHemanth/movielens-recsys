@@ -2,7 +2,11 @@ import numpy as np
 import pytest
 
 from recsys.monitoring.drift import (
-    ks_statistic, psi_categorical, psi_from_shares, psi_numeric, psi_status,
+    ks_statistic,
+    psi_categorical,
+    psi_from_shares,
+    psi_numeric,
+    psi_status,
 )
 
 

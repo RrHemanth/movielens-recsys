@@ -1,5 +1,6 @@
-from pyspark.sql import SparkSession
 import os
+
+from pyspark.sql import SparkSession
 
 os.environ.setdefault("SPARK_LOCAL_IP", "127.0.0.1")
 
