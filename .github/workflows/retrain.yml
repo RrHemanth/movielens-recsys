@@ -1,0 +1,54 @@
+name: Retrain
+
+on:
+  workflow_dispatch:            # a "Run workflow" button in the Actions tab
+  schedule:
+    - cron: "0 6 1 * *"         # 06:00 UTC on the 1st of every month
+
+jobs:
+  drift-check-and-retrain:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.13.7"
+      - run: uv sync --frozen
+
+      - name: Rebuild the data from the official source
+        run: |
+          uv run python scripts/download_data.py
+          uv run python scripts/convert_to_parquet.py
+          uv run python scripts/make_split.py
+
+      - name: Drift check
+        run: |
+          uv run python scripts/export_als_vectors.py
+          uv run python scripts/drift_replay.py
+
+      - name: Decide
+        id: decide
+        run: uv run python scripts/check_retrain_trigger.py
+
+      - name: Retrain and rebuild serving artifacts
+        if: steps.decide.outputs.retrain == 'true'
+        run: |
+          uv run python scripts/build_candidates.py --as-of 2018-01-01
+          uv run python scripts/build_features.py --as-of 2018-01-01
+          uv run python scripts/build_serving_artifacts.py
+
+      - name: Save the new artifacts
+        if: steps.decide.outputs.retrain == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: serving-artifacts
+          path: data/serving
+
+      - name: Build the Docker image
+        if: steps.decide.outputs.retrain == 'true'
+        run: docker build -t movielens-recsys:${{ github.sha }} .

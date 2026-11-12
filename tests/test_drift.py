@@ -7,6 +7,7 @@ from recsys.monitoring.drift import (
     psi_from_shares,
     psi_numeric,
     psi_status,
+    should_retrain,
 )
 
 
@@ -38,3 +39,12 @@ def test_ks_statistic_extremes():
 
 def test_status_thresholds():
     assert [psi_status(v) for v in (0.05, 0.15, 0.4)] == ["stable", "watch", "drift"]
+
+def test_retrain_when_any_signal_reaches_watch():
+    row = {"psi_activity": 0.02, "psi_movie_age": 0.01, "psi_rating": 0.0, "psi_unknown_movie": 0.12}
+    assert should_retrain(row) == (True, "psi_unknown_movie")
+
+
+def test_no_retrain_when_everything_is_stable():
+    row = {"psi_activity": 0.02, "psi_movie_age": 0.01, "psi_rating": 0.0, "psi_unknown_movie": 0.05}
+    assert should_retrain(row)[0] is False

@@ -64,3 +64,11 @@ def drift_report(reference: dict, current: dict) -> dict:
         "ks_movie_age": ks_statistic(reference["movie_age"], current["movie_age"]),
         "unknown_movie_share": float(np.mean(current["unknown_movie"])),
     }
+
+PSI_COLUMNS = ["psi_activity", "psi_movie_age", "psi_rating", "psi_unknown_movie"]
+
+
+def should_retrain(report_row: dict, threshold: float = STABLE) -> tuple[bool, str]:
+    """Retrain if any signal's PSI reaches the threshold. Returns (decision, worst signal)."""
+    worst = max(PSI_COLUMNS, key=lambda c: report_row[c])
+    return bool(report_row[worst] >= threshold), worst
