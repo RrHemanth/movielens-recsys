@@ -19,7 +19,7 @@ def merge_candidate_lists(als_lists: dict, pop_lists: dict) -> pd.DataFrame:
 
 
 def build_candidates(spark, ratings_paths: list, as_of: str, users: list, als_params: dict,
-                     n_als: int = 100, n_pop: int = 100, threshold: float = 4.0, seed: int = 42) -> pd.DataFrame:
+                     n_als: int = 100, n_pop: int = 100, threshold: float = 4.0, seed: int = 42, save_vectors_dir=None) -> pd.DataFrame:
     """Build each user's shortlist using ONLY ratings before the pretend date `as_of`."""
     as_of_ts = to_unix_seconds(as_of)
     year_before_ts = to_unix_seconds(f"{int(as_of[:4]) - 1}{as_of[4:]}")   # e.g. 2017-01-01 -> 2016-01-01
@@ -31,6 +31,8 @@ def build_candidates(spark, ratings_paths: list, as_of: str, users: list, als_pa
     als = ALSRecommender(**als_params, threshold=threshold, seed=seed,
                          train_start_ts=year_before_ts).fit(history_spark)
     als_lists = als.recommend(users, k=n_als)
+    if save_vectors_dir is not None:
+        als.save_vectors(save_vectors_dir)   # new-user fold-in needs these movie vectors
 
     popularity = PopularityRecommender(threshold=threshold, recent_days=90).fit(history_pd)
     pop_lists = popularity.recommend(users, k=n_pop)
