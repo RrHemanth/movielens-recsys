@@ -61,3 +61,8 @@ def test_bad_input_is_rejected_with_422(client, request_args):
     method, url, body = request_args
     response = client.get(url) if method == "get" else client.post(url, json=body)
     assert response.status_code == 422
+
+def test_artifacts_folder_can_come_from_environment(client, tmp_path, monkeypatch):
+    # `client` already wrote the fake files into tmp_path; now load them via the environment variable instead
+    monkeypatch.setenv("RECSYS_ARTIFACTS_DIR", str(tmp_path))
+    assert TestClient(create_app()).get("/health").json()["as_of"] == "2019-01-01"

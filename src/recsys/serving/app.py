@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 from typing import Literal
 
@@ -55,7 +56,8 @@ class RecommendationStore:
 
 # ---------- The web app ----------
 def create_app(artifacts_dir=None) -> FastAPI:
-    artifacts_dir = Path(artifacts_dir) if artifacts_dir else load_config()["paths"]["serving"]
+    # Where are the serving files? 1) passed in (tests), 2) environment variable (Docker), 3) the config (laptop)
+    artifacts_dir = Path(artifacts_dir or os.environ.get("RECSYS_ARTIFACTS_DIR") or load_config()["paths"]["serving"])
     store = RecommendationStore(artifacts_dir)
     app = FastAPI(title="MovieLens recommender", version="1.0")
 
