@@ -4,6 +4,7 @@ paths:
   interim: data/interim
   processed: data/processed
   duckdb: data/recsys.duckdb
+  serving: data/serving
 data:
   dataset: ml-25m
 
