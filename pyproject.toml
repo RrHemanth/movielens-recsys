@@ -12,6 +12,9 @@ dependencies = [
 ]
 
 [dependency-groups]
+dashboard = [
+    "streamlit>=1.67.0",
+]
 dev = [
     "httpx>=0.28.1",
     "pytest>=8",
@@ -38,4 +41,4 @@ testpaths = ["tests"]
 line-length = 100
 
 [tool.uv]
-default-groups = ["dev", "train"]   # on your laptop, install everything as before
+default-groups = ["dev", "train", "dashboard"]
