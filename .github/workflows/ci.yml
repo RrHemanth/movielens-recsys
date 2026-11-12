@@ -1,0 +1,21 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4        # Spark (in the ALS tests) needs Java
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.13.7"                # same uv as your laptop
+      - run: uv sync --frozen              # exact versions from uv.lock
+      - run: uv run ruff check .
+      - run: uv run pytest -q
